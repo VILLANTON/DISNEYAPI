@@ -1,0 +1,81 @@
+<div>
+    <input type="text">
+    <button id="button1">søk</button>
+    <button id="button2">legg til</button>
+    <p id="search">
+
+    </p>
+    <p id="resultat"></p>
+</div>
+
+<style>
+    #search div{
+        border: 2px solid black;
+        border-top: 0px;
+        width: 220px;
+    }
+    #search div:first-child{
+        border-top: 2px solid black;
+    }
+    #search div:hover{
+        cursor: pointer;
+    }
+
+</style>
+
+<script>
+    let ordEl = document.querySelector("input")
+    let knapp1El = document.querySelector("#button1")
+    let knapp2El = document.querySelector("#button2")
+    let resultatEl = document.querySelector("#resultat")
+    let searchEl = document.querySelector("#search")
+
+    const disney = async() => {
+        const url = "https://api.disneyapi.dev/character?page=1&pageSize=7438"
+        const data = await fetch(url)
+        const json = await data.json()
+        let figur = json
+        
+        let searchArray = {
+            name: [],
+            image: [],
+            url: []
+        }
+
+        while (searchEl.firstChild) {
+            searchEl.removeChild(searchEl.firstChild);
+        }
+        
+        for (let i = 0; i < figur.data.length; i++) {
+            if (figur.data[i].name.includes(ordEl.value) || figur.data[i].name.toLowerCase().includes(ordEl.value)) {
+                resultatEl.innerHTML = `${figur.data[i].name} <br>
+                <img src="${figur.data[i].imageUrl}" height="314" width="226"> <br>
+                <a href="${figur.data[i].sourceUrl}">Mer info</a>`
+                searchArray.name.push(figur.data[i].name)
+                searchArray.image.push(figur.data[i].imageUrl)
+                searchArray.url.push(figur.data[i].sourceUrl)
+            }
+        }
+
+        for (let i = 0; i < searchArray.name.length; i++) {
+            let newDiv = document.createElement("div")
+            newDiv.id = searchArray.name[i]
+            newDiv.innerHTML = searchArray.name[i]
+            searchEl.appendChild(newDiv)
+            
+            newDiv.addEventListener("click", function() {
+                resultatEl.innerHTML = `${searchArray.name[i]} <br>
+                <img src="${searchArray.image[i]}" height="314" width="226"> <br>
+                <a href="${searchArray.url[i]}">Mer info</a>`
+                ordEl.value = searchArray.name[i]
+                while (searchEl.firstChild) {
+                    searchEl.removeChild(searchEl.firstChild);
+                }
+            })
+        }
+    }
+
+
+
+    knapp1El.addEventListener("click",disney)
+</script>
